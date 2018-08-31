@@ -3,6 +3,7 @@ import webapp2
 from google.appengine.ext.webapp import template
 from apiclient.discovery import build
 from oauth2client.appengine import AppAssertionCredentials
+import json
 
 url = 'https://www.googleapis.com/auth/bigquery'
 PROJECT_NUMBER = 'wifield-210400'
@@ -33,11 +34,11 @@ class GetChartData(webapp2.RequestHandler):
         queryData = {'query':'SELECT SUM(temps000, temps001, temps002, temps003, temps004, temps005, temps006, temps007, temps008, temps009, temps010, temps011) as WCount, vin as corpus_date,Rainmm as Work FROM '
         '[publicdata:wifield_bigquery.wifield_data] WHERE macaddress="0c2a6908a5a3"'}
         tableData = bigquery_service.jobs()
-        dataList = tableData.query(projectId=PROJECT_NUMBER,body=queryData).execute()
+        response = tableData.query(projectId=PROJECT_NUMBER,body=queryData).execute()
 
     resp = []
-    if 'rows' in dataList:
-      for row in dataList['rows']:
+    if 'rows' in response:
+      for row in response['rows']:
         for key,dict_list in row.iteritems():
           count = dict_list[0]
           year = dict_list[1]
