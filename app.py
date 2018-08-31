@@ -27,6 +27,28 @@ class ShowHome(webapp2.RequestHandler):
         template_path = 'Templates/index.html'
         self.response.out.write(template.render(template_path,template_data))
 
+class GetChartData(webapp2.RequestHandler):
+    def get(self):
+        inputData = self.request.get("inputData")
+        queryData = {'query':'SELECT SUM(temps000, temps001, temps002, temps003, temps004, temps005, temps006, temps007, temps008, temps009, temps010, temps011) as WCount, vin as corpus_date,Rainmm as Work FROM '
+        '[publicdata:wifield_bigquery.wifield_data] WHERE macaddress="0c2a6908a5a3"'}
+        tableData = bigquery_service.jobs()
+        dataList = tableData.query(projectId=PROJECT_NUMBER,body=queryData).execute()
+
+    resp = []
+    if 'rows' in dataList:
+      for row in dataList['rows']:
+        for key,dict_list in row.iteritems():
+          count = dict_list[0]
+          year = dict_list[1]
+          corpus = dict_list[2]
+          resp.append({'count': count['v'],'year':year['v'],'corpus':corpus['v']})
+    else:
+      resp.append({'count':'0','year':'0','corpus':'0'})
+
+
+    self.response.headers['Content-Type'] = 'application/json'
+    self.response.out.write(json.dumps(resp))
 
 class DisplayChart(webapp2.RequestHandler):
     def get(self):
@@ -35,9 +57,17 @@ class DisplayChart(webapp2.RequestHandler):
         self.response.out.write(template.render(template_path,template_data))
 
 
+class DisplayChart3(webapp2.RequestHandler):
+    def get(self):
+        template_data = {}
+        template_path = 'Templates/displayChart_3.html'
+        self.response.out.write(template.render(template_path,template_data))
+
 
 application = webapp2.WSGIApplication([
     ('/chart',ShowChartPage),
     ('/displayChart',DisplayChart),
+    ('/displayChart3',DisplayChart3),
+    ('/getChartData',GetChartData),
     ('/', ShowHome),
 ], debug=True)
