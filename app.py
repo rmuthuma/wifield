@@ -20,7 +20,7 @@ class ShowChartPage(webapp2.RequestHandler):
 	tableData = bigquery_service.jobs()
 	response = tableData.query(projectId=PROJECT_NUMBER,body=queryData).execute()
 	self.response.out.write(response)
-	#self.response.out.write(template.render(temp_path,temp_data))
+	#jself.response.out.write(template.render(temp_path,temp_data))
 
 class ShowHome(webapp2.RequestHandler):
     def get(self):
@@ -28,17 +28,17 @@ class ShowHome(webapp2.RequestHandler):
         template_path = 'Templates/index.html'
         self.response.out.write(template.render(template_path,template_data))
 
-class GetChartData(webapp2.RequestHandler):
+class getChartData(webapp2.RequestHandler):
     def get(self):
         inputData = self.request.get("inputData")
         queryData = {'query':'SELECT SUM(temps000, temps001, temps002, temps003, temps004, temps005, temps006, temps007, temps008, temps009, temps010, temps011) as WCount, vin as corpus_date,Rainmm as Work FROM '
         '[publicdata:wifield_bigquery.wifield_data] WHERE macaddress="0c2a6908a5a3"'}
         tableData = bigquery_service.jobs()
-        response = tableData.query(projectId=PROJECT_NUMBER,body=queryData).execute()
+        dataList = tableData.query(projectId=PROJECT_NUMBER,body=queryData).execute()
 
     resp = []
-    if 'rows' in response:
-      for row in response['rows']:
+    if 'rows' in dataList:
+      for row in dataList['rows']:
         for key,dict_list in row.iteritems():
           count = dict_list[0]
           year = dict_list[1]
@@ -64,11 +64,17 @@ class DisplayChart3(webapp2.RequestHandler):
         template_path = 'Templates/displayChart_3.html'
         self.response.out.write(template.render(template_path,template_data))
 
+class DisplayChart4(webapp2.RequestHandler):
+    def get(self):
+        template_data = {}
+        template_path = 'Templates/displayChart_4.html'
+        self.response.out.write(template.render(template_path,template_data))
 
 application = webapp2.WSGIApplication([
     ('/chart',ShowChartPage),
     ('/displayChart',DisplayChart),
     ('/displayChart3',DisplayChart3),
+    ('/displayChart4',DisplayChart4),
     ('/getChartData',GetChartData),
     ('/', ShowHome),
 ], debug=True)
