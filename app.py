@@ -28,7 +28,7 @@ class ShowHome(webapp2.RequestHandler):
         template_path = 'Templates/index.html'
         self.response.out.write(template.render(template_path,template_data))
 
-class getChartData(webapp2.RequestHandler):
+class GetChartData(webapp2.RequestHandler):
     def get(self):
         inputData = self.request.get("inputData")
         queryData = {'query':'SELECT SUM(temps000, temps001, temps002, temps003, temps004, temps005, temps006, temps007, temps008, temps009, temps010, temps011) as WCount, vin as corpus_date,Rainmm as Work FROM '
@@ -36,20 +36,20 @@ class getChartData(webapp2.RequestHandler):
         tableData = bigquery_service.jobs()
         dataList = tableData.query(projectId=PROJECT_NUMBER,body=queryData).execute()
 
-    resp = []
-    if 'rows' in dataList:
-      for row in dataList['rows']:
-        for key,dict_list in row.iteritems():
-          count = dict_list[0]
-          year = dict_list[1]
-          corpus = dict_list[2]
-          resp.append({'count': count['v'],'year':year['v'],'corpus':corpus['v']})
-    else:
-      resp.append({'count':'0','year':'0','corpus':'0'})
+        resp = []
+        if 'rows' in dataList:
+          for row in dataList['rows']:
+            for key,dict_list in row.iteritems():
+              count = dict_list[0]
+              year = dict_list[1]
+              corpus = dict_list[2]
+              resp.append({'count': count['v'],'year':year['v'],'corpus':corpus['v']})
+        else:
+          resp.append({'count':'0','year':'0','corpus':'0'})
 
 
-    self.response.headers['Content-Type'] = 'application/json'
-    self.response.out.write(json.dumps(resp))
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(json.dumps(resp))
 
 class DisplayChart(webapp2.RequestHandler):
     def get(self):
