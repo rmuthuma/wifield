@@ -16,7 +16,7 @@ class ShowChartPage(webapp2.RequestHandler):
     def get(self):
 	temp_data = {}
 	temp_path = 'Templates/chart.html'
-	queryData = {'query':'SELECT macaddress FROM [publicdata:wifield_bigquery.wifield_data] LIMIT 1000'}
+	queryData = {'query':'SELECT distinct(macaddress) FROM [wifield_bigquery.wifield_data] LIMIT 1000'}
 	tableData = bigquery_service.jobs()
 	response = tableData.query(projectId=PROJECT_NUMBER,body=queryData).execute()
 	self.response.out.write(response)
